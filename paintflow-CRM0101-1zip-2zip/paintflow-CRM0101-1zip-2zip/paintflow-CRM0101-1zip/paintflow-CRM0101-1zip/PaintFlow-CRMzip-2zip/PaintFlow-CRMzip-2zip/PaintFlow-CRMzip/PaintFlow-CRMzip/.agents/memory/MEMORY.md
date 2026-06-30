@@ -1,0 +1,2 @@
+- [Monorepo & build](monorepo-build.md) — paths, typecheck/build commands, and key build conventions
+- [Payment module design](payment-module.md) — record_payment() RPC, usePayments.ts hooks, BillView dialog, dashboard INR stats

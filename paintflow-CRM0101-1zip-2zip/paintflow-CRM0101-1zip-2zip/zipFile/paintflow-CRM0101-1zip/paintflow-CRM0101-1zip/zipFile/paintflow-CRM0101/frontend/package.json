@@ -1,0 +1,8 @@
+{
+  "name": "frontend-launcher",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "cd /app/artifacts/paintflow-crm && PORT=3000 BASE_PATH=/ pnpm run dev"
+  }
+}

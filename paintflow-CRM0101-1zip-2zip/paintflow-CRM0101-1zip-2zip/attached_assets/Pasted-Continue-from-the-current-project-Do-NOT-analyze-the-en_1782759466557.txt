@@ -1,0 +1,158 @@
+Continue from the current project.
+
+Do NOT analyze the entire repository.
+
+Read only:
+
+* Dashboard
+* Companies
+* Purchases
+* Bills
+* Reports
+
+Task:
+
+Create an "Owner Business Center" inside the existing Dashboard.
+
+Do NOT create a new page.
+
+Do NOT change routing.
+
+Use the existing dashboard layout.
+
+Add these business widgets:
+
+1. Welcome Card
+
+Show:
+
+Welcome back,
+Ankit Jain 👋
+
+Owner of GOYAL TRADERS
+
+Also display:
+
+* Today's Date
+* Current Time
+* Shop Status (Open/Closed based on system time)
+
+---
+
+2. Today's Business Summary
+
+Display:
+
+* Today's Sales
+* Today's Purchase
+* Today's Collection
+* Today's Supplier Payment
+* Today's Profit Estimate
+
+---
+
+3. Pending Actions
+
+Show cards for:
+
+* Customer Payments Due
+* Company Payments Due
+* Low Stock Products
+* Pending Purchase Payments
+
+Each card should show the count and total amount.
+
+---
+
+4. Quick Actions
+
+Add large action buttons:
+
+* Create Bill
+* Add Customer
+* Add Product
+* Record Purchase
+* Record Supplier Payment
+* View Reports
+
+---
+
+5. Business Health
+
+Show colored indicators:
+
+🟢 Cash Flow
+
+🟡 Outstanding Receivables
+
+🟠 Outstanding Supplier Payments
+
+🔴 Low Stock Alerts
+
+---
+
+6. Business Performance
+
+Display:
+
+* Sales Growth
+* Purchase Growth
+* Collection Rate
+* Payment Completion Rate
+
+Use compact charts and progress bars.
+
+---
+
+7. Brand Performance
+
+Compare:
+
+JSW Paints
+
+Birla Opus
+
+Other Brands
+
+Display:
+
+* Sales
+* Purchases
+* Profit Estimate
+
+---
+
+8. Smart Alerts
+
+Show only useful alerts:
+
+* Products to Reorder
+* Large Pending Customer Bills
+* Supplier Payments Due
+* Recently Added Customers
+
+---
+
+Design Requirements
+
+* Keep the existing dashboard.
+* Do NOT redesign the application.
+* Use existing components.
+* Keep animations lightweight.
+* Professional blue, white and grey theme.
+* Make it look like premium commercial ERP software.
+
+Do NOT modify:
+
+* Authentication
+* Database schema
+* Existing business logic
+* Existing routes
+
+Run:
+
+* TypeScript check
+* Fix only dashboard-related issues
+* Run the application
+
+Stop after completion.

@@ -1,0 +1,123 @@
+Continue from the current project.
+
+Do NOT analyze entire codebase.
+
+Only add seed/demo data safely.
+
+Task: Create ADVANCED REALISTIC DEMO DATA for GOYAL TRADERS CRM
+
+────────────────────────────
+1. DEMO PRODUCTS (Paint Industry)
+────────────────────────────
+
+Add realistic paint shop products:
+
+JSW Paints:
+- JSW Interior Emulsion (2 Year Warranty) - ₹1850 per 10L
+- JSW Exterior Acrylic (4 Year Warranty) - ₹2400 per 10L
+- JSW Premium Royale (6 Year Warranty) - ₹3200 per 10L
+- JSW Primer Coat - ₹950 per 10L
+- JSW Waterproof Exterior Paint - ₹2800 per 10L
+
+Birla Opus:
+- Birla Opus Interior Paint - ₹1750 per 10L
+- Birla Opus Exterior Paint - ₹2300 per 10L
+- Birla Opus Putty - ₹650 per 20kg
+- Birla Opus Primer - ₹900 per 10L
+- Birla Opus Rustic Texture - ₹3500 per bucket
+
+Other Items:
+- Wall Putty White Cement - ₹600 per 20kg
+- Red Oxide Primer - ₹800 per 10L
+- Enamel Oil Paint - ₹1200 per 10L
+- Rust Protection Paint - ₹1400 per 10L
+- Wood Polish - ₹500 per bottle
+
+Each product must include:
+- Name
+- Category (JSW / Birla Opus / Others)
+- Price
+- Stock quantity (realistic)
+- Unit (Litre / Kg)
+
+────────────────────────────
+2. DEMO CUSTOMERS
+────────────────────────────
+
+Create customers:
+
+- Ramesh Verma (Cash Buyer)
+- Suresh Yadav (UPI Buyer)
+- Mohan Sharma (Cheque Buyer)
+- Anita Devi (Partial Payment 50%)
+- Vikram Singh (Large Contractor Buyer)
+
+Add details:
+- Phone (dummy but realistic)
+- Address (local Indian style)
+- Payment preference
+
+────────────────────────────
+3. REALISTIC INVOICES (IMPORTANT MONEY FLOW)
+────────────────────────────
+
+Create sample invoices with real business values:
+
+Invoice 1:
+- Customer: Ramesh Verma
+- Items: JSW Interior Emulsion + Primer
+- Total: ₹22,500
+- Payment: FULL CASH PAID
+- Due: ₹0
+
+Invoice 2:
+- Customer: Suresh Yadav
+- Items: Birla Opus Exterior + Putty
+- Total: ₹18,400
+- Payment: UPI PAID
+- Due: ₹0
+
+Invoice 3:
+- Customer: Mohan Sharma
+- Items: Enamel Paint + Rust Paint
+- Total: ₹12,000
+- Payment: CHEQUE (PENDING)
+- Due: ₹12,000
+
+Invoice 4:
+- Customer: Anita Devi
+- Items: JSW Premium Royale + Primer
+- Total: ₹20,000
+- Payment: ₹10,000 PAID (50%)
+- Due: ₹10,000
+
+Invoice 5:
+- Customer: Vikram Singh (Contractor Order)
+- Items: Multiple bulk paints
+- Total: ₹55,000
+- Payment: ₹30,000 PAID (UPI)
+- Due: ₹25,000
+
+────────────────────────────
+4. BUSINESS REALISM LOGIC
+────────────────────────────
+
+- Link invoices with customers properly
+- Reduce stock after sales
+- Show due amount clearly in reports
+- Reflect payments in dashboard stats
+- Ensure analytics (sales graphs) reflect this data
+
+────────────────────────────
+5. IMPORTANT RULES
+────────────────────────────
+
+- Do NOT break existing database structure
+- Do NOT overwrite real production data if exists
+- Only insert demo seed data safely
+- Do NOT change UI design or logic
+
+After completion:
+- Run TypeScript check
+- Ensure app runs successfully
+- No errors in console
