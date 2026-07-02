@@ -140,3 +140,36 @@ credentials.json
 *.pem
 *.key
 .credentials
+
+# Build outputs (generated — never commit)
+dist/
+build/
+out/
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# pnpm store
+.pnpm-store/
+
+# Replit-internal
+.replit
+replit.nix
+.replitignore
+.cache/
+
+# Uploaded/extracted zip backups (not source code)
+*.zip
+zipFile/
+PaintFlow-CRMzip*/
+paintflow-CRM*/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
