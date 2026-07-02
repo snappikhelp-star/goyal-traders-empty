@@ -8,7 +8,7 @@ import { VitePWA } from "vite-plugin-pwa";
 const port = 5173;
 
 
-const basePath = process.env.BASE_PATH || "/";
+const basePath = "/";
 
 if (!basePath) {
   throw new Error(
