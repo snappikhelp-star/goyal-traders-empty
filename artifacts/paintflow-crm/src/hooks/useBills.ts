@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
-import type { Json } from "@/lib/database.types";
+import { api, buildQuery } from "@/lib/api";
 import type { Customer, Product } from "@/types";
 
 // ─── Types ───────────────────────────────────────────────────
@@ -67,34 +66,8 @@ export function useProductSearch(search: string) {
   return useQuery({
     queryKey: ["product-search", search],
     queryFn: async (): Promise<ProductWithStock[]> => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let query = (supabase.from("products") as any)
-        .select("*, inventory(quantity)")
-        .order("name")
-        .limit(30);
-
-      // Only show active products in billing search
-      query = query.eq("is_active", true);
-
-      if (search.trim()) {
-        query = query.or(
-          `name.ilike.%${search}%,sku.ilike.%${search}%,shade_number.ilike.%${search}%,barcode.ilike.%${search}%`
-        );
-      }
-
-      const { data, error } = await query;
-      if (error) throw new Error(error.message);
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return (data ?? []).map((p: any) => {
-        const inv = p.inventory;
-        const stock: number = Array.isArray(inv)
-          ? (inv[0]?.quantity ?? 0)
-          : (inv?.quantity ?? 0);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { inventory: _inv, ...rest } = p;
-        return { ...rest, stock } as ProductWithStock;
-      });
+      const qs = buildQuery({ search, activeOnly: true });
+      return api.get<ProductWithStock[]>(`/products${qs}`);
     },
     placeholderData: (prev: ProductWithStock[] | undefined) => prev,
   });
@@ -108,41 +81,22 @@ export function useCustomerSearch(search: string) {
   return useQuery({
     queryKey: ["customer-search-bill", search],
     queryFn: async (): Promise<CustomerSummary[]> => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let query = (supabase.from("customers") as any)
-        .select("id, name, phone, city")
-        .order("name")
-        .limit(20);
-
-      if (search.trim()) {
-        query = query.or(
-          `name.ilike.%${search}%,phone.ilike.%${search}%,alternate_mobile.ilike.%${search}%`
-        );
-      }
-
-      const { data, error } = await query;
-      if (error) throw new Error(error.message);
-      return (data ?? []) as CustomerSummary[];
+      const qs = buildQuery({ q: search });
+      return api.get<CustomerSummary[]>(`/customers/search${qs}`);
     },
     placeholderData: (prev: CustomerSummary[] | undefined) => prev,
   });
 }
 
-// ─── Create bill via atomic RPC ───────────────────────────────
+// ─── Create bill ──────────────────────────────────────────────
 //
-// Calls the create_invoice() SECURITY DEFINER PostgreSQL function
-// which atomically:
-//   1. Validates auth + inputs
-//   2. Pre-validates and locks inventory rows (prevents race conditions)
-//   3. Inserts the bill header (trigger generates bill_number)
-//   4. Inserts all bill_items
-//   5. Deducts inventory (CHECK constraint prevents negatives)
-//   6. Stores paint shade history for items with shade_number
-//   7. Updates customer stats (total_purchase_amount, total_purchase_count,
-//      pending_balance, last_purchase_date)
-//   8. Creates a payment record if paid_amount > 0
-//   9. Writes an audit log entry
-//  10. Rolls back everything on any error
+// POST /bills atomically:
+//   1. Validates inputs and locks inventory rows (prevents race conditions)
+//   2. Inserts the bill header (server generates bill_number)
+//   3. Inserts all bill_items and deducts inventory
+//   4. Stores paint shade history for items with a shade name/code
+//   5. Creates a payment record if paid_amount > 0
+//   6. Updates customer.last_purchase_date
 //
 // On success, invalidates all affected React Query caches.
 
@@ -151,40 +105,26 @@ export function useCreateBill() {
 
   return useMutation({
     mutationFn: async (payload: CreateBillPayload): Promise<CreateInvoiceResult> => {
-      const rpcPayload: Json = {
-        customer_id:    payload.customer_id,
-        date:           payload.date,
-        due_date:       payload.due_date ?? null,
+      const body = {
+        customer_id: payload.customer_id,
+        date: payload.date,
+        due_date: payload.due_date ?? null,
         payment_method: payload.payment_method,
-        notes:          payload.notes ?? null,
-        paid_amount:    payload.paid_amount,
+        notes: payload.notes ?? null,
+        paid_amount: payload.paid_amount,
         items: payload.items.map((item) => ({
-          product_id:      item.product_id,
-          product_name:    item.product_name,
-          brand:           item.brand ?? null,
-          shade_number:    item.shade_number ?? null,
-          pack_size:       item.pack_size ?? null,
-          quantity:        item.quantity,
-          unit_price:      item.unit_price,
-          discount_pct:    item.discount_pct,
-          gst_rate:        item.gst_rate,
-          room_area:       item.room_area ?? null,
-          house_mapping_id: item.house_mapping_id ?? null,
+          product_id: item.product_id,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          discount: round2((item.quantity * item.unit_price) * (item.discount_pct / 100)),
+          gst_rate: item.gst_rate,
+          shade_name: item.shade_number ?? undefined,
+          room_area: item.room_area ?? undefined,
+          house_mapping_id: item.house_mapping_id ?? undefined,
         })),
       };
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any).rpc("create_invoice", {
-        p_payload: rpcPayload,
-      });
-
-      if (error) {
-        // Surface the PostgreSQL RAISE EXCEPTION message directly so the
-        // user sees "STOCK: Insufficient stock …" rather than a raw code.
-        throw new Error(error.message);
-      }
-
-      const result = data as CreateInvoiceResult;
+      const result = await api.post<CreateInvoiceResult>("/bills", body);
 
       if (!result?.success) {
         throw new Error("Invoice creation failed: unexpected server response");
@@ -194,18 +134,13 @@ export function useCreateBill() {
     },
 
     onSuccess: (result) => {
-      // Invalidate every cache that the RPC may have mutated:
-      //   bills            — new bill row
-      //   customers        — total_purchase_amount / pending_balance / last_purchase_date
-      //   inventory        — stock quantities reduced
-      //   payments         — new payment row (when paid_amount > 0)
-      //   customer-paint-shades — shade history rows inserted
       void qc.invalidateQueries({ queryKey: ["bills"] });
       void qc.invalidateQueries({ queryKey: ["customers"] });
       void qc.invalidateQueries({ queryKey: ["inventory"] });
       void qc.invalidateQueries({ queryKey: ["payments"] });
       void qc.invalidateQueries({ queryKey: ["customer-paint-shades"] });
       void qc.invalidateQueries({ queryKey: ["product-search"] });
+      void qc.invalidateQueries({ queryKey: ["dashboard"] });
 
       toast.success(`Invoice ${result.bill_number} created`);
     },
@@ -219,15 +154,8 @@ export function useCreateBill() {
 export function useQuickCreateCustomer() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (values: { name: string; phone: string }): Promise<CustomerSummary> => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase.from("customers") as any)
-        .insert(values)
-        .select("id, name, phone, city")
-        .single();
-      if (error) throw new Error(error.message);
-      return data as CustomerSummary;
-    },
+    mutationFn: async (values: { name: string; phone: string }): Promise<CustomerSummary> =>
+      api.post<CustomerSummary>("/customers", values),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["customer-search-bill"] });
       void qc.invalidateQueries({ queryKey: ["customers"] });
