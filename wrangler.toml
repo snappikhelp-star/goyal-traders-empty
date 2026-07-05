@@ -4,13 +4,21 @@
 #   1. Push repository to GitHub
 #   2. Connect repo in Cloudflare Pages dashboard
 #   3. Set build settings:
-#        Build command:  pnpm --filter @workspace/paintflow-crm run build
+#        Root directory: /            (repo root — required for pnpm workspaces)
+#        Build command:  pnpm install --frozen-lockfile && pnpm --filter @workspace/paintflow-crm run build
 #        Output dir:     artifacts/paintflow-crm/dist/public
-#   4. Add environment variables in CF dashboard:
-#        PORT              = 5000
-#        BASE_PATH         = /
-#        VITE_SUPABASE_URL = https://lqfgxmpaqutugnvbngrl.supabase.co
+#   4. Add environment variables in the CF Pages dashboard, for BOTH the
+#      "Production" and "Preview" environments (Settings → Environment
+#      variables). Variables set only in wrangler.toml's [vars] are NOT
+#      injected into the build step for Pages — they must be set in the
+#      dashboard, which is why VITE_* vars were previously undefined:
+#        VITE_SUPABASE_URL      = https://lqfgxmpaqutugnvbngrl.supabase.co
 #        VITE_SUPABASE_ANON_KEY = <your anon key>
+#        PORT                   = 5000
+#        BASE_PATH              = /
+#   5. Node version is pinned via the root .node-version file (20). No
+#      NODE_VERSION override should be needed, but it can be set in the
+#      dashboard as a fallback if Cloudflare's build image ignores it.
 # ──────────────────────────────────────────────────────────────────
 
 name = "goyal-traders-crm"
