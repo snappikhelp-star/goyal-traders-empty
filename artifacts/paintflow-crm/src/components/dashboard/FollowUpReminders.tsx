@@ -8,7 +8,6 @@ import {
   IndianRupee,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabase";
 import { useShopProfile } from "@/lib/shopProfile";
@@ -52,6 +51,14 @@ function daysAgo(iso: string | null): number | null {
   return Math.floor(ms / 86_400_000);
 }
 
+const avatarColors = [
+  "bg-rose-100 text-rose-700",
+  "bg-orange-100 text-orange-700",
+  "bg-amber-100 text-amber-700",
+  "bg-red-100 text-red-700",
+  "bg-pink-100 text-pink-700",
+];
+
 export default function FollowUpReminders() {
   const { profile } = useShopProfile();
   const { data, isLoading } = usePendingCustomers();
@@ -72,7 +79,7 @@ export default function FollowUpReminders() {
       data-testid="dashboard-follow-up-reminders"
       className="border-0 shadow-md overflow-hidden"
     >
-      <CardHeader className="pb-3 bg-gradient-to-r from-orange-500 to-rose-500">
+      <CardHeader className="pb-3 px-4 pt-4 bg-gradient-to-r from-orange-500 to-rose-500">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-semibold text-white flex items-center gap-2">
             <BellRing className="h-4 w-4 text-orange-100 animate-[spin-slow_4s_linear_infinite]" />
@@ -86,7 +93,8 @@ export default function FollowUpReminders() {
           </Link>
         </div>
       </CardHeader>
-      <CardContent className="pt-3">
+
+      <CardContent className="px-3 py-3 sm:px-4">
         {isLoading ? (
           <div className="space-y-2">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -96,9 +104,7 @@ export default function FollowUpReminders() {
         ) : !data || data.length === 0 ? (
           <div className="flex flex-col items-center text-center py-6">
             <UserPlus className="h-7 w-7 text-muted-foreground/30 mb-2" />
-            <p className="text-sm text-muted-foreground">
-              No pending dues right now
-            </p>
+            <p className="text-sm text-muted-foreground">No pending dues right now</p>
             <p className="text-[11px] text-muted-foreground/80 mt-0.5">
               You&apos;re all caught up — great work!
             </p>
@@ -107,65 +113,67 @@ export default function FollowUpReminders() {
           <ul className="space-y-2">
             {data.map((c, idx) => {
               const days = daysAgo(c.last_purchase_date);
-              const avatarColors = [
-                "bg-rose-100 text-rose-700",
-                "bg-orange-100 text-orange-700",
-                "bg-amber-100 text-amber-700",
-                "bg-red-100 text-red-700",
-                "bg-pink-100 text-pink-700",
-              ];
               return (
                 <li
                   key={c.id}
-                  className="flex items-center gap-3 rounded-lg border border-orange-100 bg-orange-50/30 p-2.5 hover:border-orange-200 hover:bg-orange-50 transition-colors"
+                  className="rounded-lg border border-orange-100 bg-orange-50/30 hover:border-orange-200 hover:bg-orange-50 transition-colors"
                   data-testid={`follow-up-row-${c.id}`}
                 >
-                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-semibold text-sm ${avatarColors[idx % avatarColors.length]}`}>
-                    {c.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <Link
-                      to={`/customers/${c.id}`}
-                      className="text-sm font-medium truncate hover:underline block"
+                  {/* ── Main row ── */}
+                  <div className="flex items-center gap-2.5 p-2.5">
+                    {/* Avatar */}
+                    <div
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-semibold text-sm ${avatarColors[idx % avatarColors.length]}`}
                     >
-                      {c.name}
-                    </Link>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <Badge
-                        variant="outline"
-                        className="text-[10px] gap-1 border-orange-300 text-orange-700 bg-orange-50 px-1.5 py-0"
-                      >
-                        <IndianRupee className="h-2.5 w-2.5" />
-                        {INR.format(c.pending_balance)} due
-                      </Badge>
-                      {days !== null && (
-                        <span className="text-[10px] text-muted-foreground">
-                          {days === 0 ? "today" : `${days}d ago`}
-                        </span>
-                      )}
+                      {c.name.charAt(0).toUpperCase()}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {c.phone && (
-                      <a
-                        href={`tel:${c.phone.replace(/\s+/g, "")}`}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-orange-200 bg-white hover:bg-orange-50 text-orange-500 hover:text-orange-700"
-                        title="Call"
-                        data-testid={`follow-up-call-${c.id}`}
+
+                    {/* Name + badge */}
+                    <div className="min-w-0 flex-1">
+                      <Link
+                        to={`/customers/${c.id}`}
+                        className="text-sm font-medium truncate hover:underline block leading-tight"
                       >
-                        <Phone className="h-3.5 w-3.5" />
-                      </a>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-8 gap-1.5 border-green-200 text-green-700 hover:bg-green-50"
-                      onClick={() => handleRemind(c)}
-                      data-testid={`follow-up-remind-${c.id}`}
-                    >
-                      <MessageCircle className="h-3.5 w-3.5" />
-                      Remind
-                    </Button>
+                        {c.name}
+                      </Link>
+                      <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] gap-0.5 border-orange-300 text-orange-700 bg-orange-50 px-1.5 py-0 h-4"
+                        >
+                          <IndianRupee className="h-2.5 w-2.5" />
+                          {INR.format(c.pending_balance)} due
+                        </Badge>
+                        {days !== null && (
+                          <span className="text-[10px] text-muted-foreground">
+                            {days === 0 ? "today" : `${days}d ago`}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Actions — icon-only on mobile, with label on sm+ */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {c.phone && (
+                        <a
+                          href={`tel:${c.phone.replace(/\s+/g, "")}`}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-orange-200 bg-white hover:bg-orange-50 text-orange-500 hover:text-orange-700 transition-colors"
+                          title="Call"
+                          data-testid={`follow-up-call-${c.id}`}
+                        >
+                          <Phone className="h-3.5 w-3.5" />
+                        </a>
+                      )}
+                      <button
+                        onClick={() => handleRemind(c)}
+                        data-testid={`follow-up-remind-${c.id}`}
+                        title="Send WhatsApp reminder"
+                        className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-green-200 bg-white px-2 sm:px-3 text-green-700 hover:bg-green-50 transition-colors text-xs font-medium"
+                      >
+                        <MessageCircle className="h-3.5 w-3.5 shrink-0" />
+                        <span className="hidden sm:inline">Remind</span>
+                      </button>
+                    </div>
                   </div>
                 </li>
               );
