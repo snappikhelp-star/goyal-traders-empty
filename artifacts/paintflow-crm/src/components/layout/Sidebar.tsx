@@ -59,7 +59,7 @@ export default function Sidebar({
   onClose,
   isMobile = false,
 }: SidebarProps) {
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
   const { profile } = useShopProfile();
   const location = useLocation();
 
@@ -190,7 +190,7 @@ export default function Sidebar({
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={signOut}
+                onClick={logout}
                 className="flex h-10 w-10 items-center justify-center rounded-lg text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
               >
                 <LogOut className="h-4 w-4" />
@@ -210,7 +210,7 @@ export default function Sidebar({
               <p className="text-xs text-sidebar-foreground/50 truncate">Owner</p>
             </div>
             <button
-              onClick={signOut}
+              onClick={logout}
               className="shrink-0 rounded-md p-1.5 text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
               title="Sign out"
             >

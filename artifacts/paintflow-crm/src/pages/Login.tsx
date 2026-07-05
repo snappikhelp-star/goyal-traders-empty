@@ -1,40 +1,10 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { useShopProfile } from "@/lib/shopProfile";
-
-interface LoginForm {
-  email: string;
-  password: string;
-}
+import { Button } from "@/components/ui/button";
 
 export default function Login() {
-  const { signIn } = useAuth();
-  const navigate = useNavigate();
+  const { login } = useAuth();
   const { profile } = useShopProfile();
-  const [showPassword, setShowPassword] = useState(false);
-  const [authError, setAuthError] = useState<string | null>(null);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginForm>();
-
-  const onSubmit = async (data: LoginForm) => {
-    setAuthError(null);
-    const { error } = await signIn(data.email, data.password);
-    if (error) {
-      setAuthError("Invalid email or password. Please try again.");
-    } else {
-      navigate("/dashboard");
-    }
-  };
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
@@ -105,74 +75,9 @@ export default function Login() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@goyaltraders.com"
-                autoComplete="email"
-                {...register("email", {
-                  required: "Email is required",
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "Enter a valid email address",
-                  },
-                })}
-                className={errors.email ? "border-destructive" : ""}
-              />
-              {errors.email && (
-                <p className="text-xs text-destructive">{errors.email.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  autoComplete="current-password"
-                  {...register("password", { required: "Password is required" })}
-                  className={errors.password ? "border-destructive pr-10" : "pr-10"}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  tabIndex={-1}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-xs text-destructive">{errors.password.message}</p>
-              )}
-            </div>
-
-            {authError && (
-              <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3">
-                <p className="text-sm text-destructive">{authError}</p>
-              </div>
-            )}
-
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in…
-                </>
-              ) : (
-                "Sign in"
-              )}
-            </Button>
-          </form>
+          <Button type="button" className="w-full" onClick={login}>
+            Sign in with Replit
+          </Button>
         </div>
       </div>
     </div>

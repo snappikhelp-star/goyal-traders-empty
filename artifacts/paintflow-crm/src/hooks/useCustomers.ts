@@ -9,6 +9,7 @@ import type {
   CustomerPaintShade,
   Payment,
   CustomerStats,
+  Bill,
 } from "@/types";
 
 // ─── List with search / sort / paginate ─────────────────────
@@ -82,7 +83,7 @@ export function useCustomerStats(id: string) {
 export function useCustomerBills(customerId: string) {
   return useQuery({
     queryKey: ["customer-bills", customerId],
-    queryFn: async () => api.get(`/customers/${customerId}/bills`),
+    queryFn: async () => api.get<Bill[]>(`/customers/${customerId}/bills`),
     enabled: !!customerId,
   });
 }

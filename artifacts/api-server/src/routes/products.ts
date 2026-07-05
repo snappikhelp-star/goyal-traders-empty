@@ -62,7 +62,7 @@ router.get(
       db.select({ count: sql<number>`count(*)::int` }).from(products).where(where),
     ]);
 
-    const data = rows.map((r) => ({ ...r.product, inventory: r.inv.quantity !== null ? r.inv : null }));
+    const data = rows.map((r) => ({ ...r.product, inventory: r.inv?.quantity !== null ? r.inv : null }));
     res.json({ data, count });
   }),
 );

@@ -42,18 +42,12 @@ function LoadingScreen() {
   );
 }
 
-function isSessionValid(session: { expires_at?: number | null } | null): boolean {
-  if (!session) return false;
-  if (!session.expires_at) return true;
-  return session.expires_at * 1000 > Date.now();
-}
-
 /** Redirects to /login when unauthenticated. No role checks. */
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, session, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
   if (loading) return <LoadingScreen />;
-  if (!user || !isSessionValid(session)) {
+  if (!isAuthenticated) {
     return (
       <Navigate
         to="/login"
@@ -67,10 +61,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 /** Redirects logged-in users away from the login page. */
 function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { user, session, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
   if (loading) return <LoadingScreen />;
-  if (user && isSessionValid(session)) {
+  if (isAuthenticated) {
     const from = (location.state as { from?: string } | null)?.from;
     return <Navigate to={from ?? "/dashboard"} replace />;
   }
