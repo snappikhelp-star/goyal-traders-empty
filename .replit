@@ -54,3 +54,8 @@ waitForPort = 5000
 
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[deployment]
+deploymentTarget = "static"
+build = ["pnpm", "--filter", "@workspace/paintflow-crm", "run", "build"]
+publicDir = "artifacts/paintflow-crm/dist/public"
