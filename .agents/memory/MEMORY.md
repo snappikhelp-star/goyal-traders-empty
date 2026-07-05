@@ -1,0 +1,1 @@
+- [Supabase-only CRM architecture](supabase-crm-arch.md) — API server uses Replit OIDC; all CRM hooks must use Supabase client directly, never the express API server.
