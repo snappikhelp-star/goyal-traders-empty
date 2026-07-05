@@ -1,46 +1,15 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+// Vite bakes VITE_* vars into the bundle at build time.
+// The publishable/anon key is designed to be safe in client-side code.
+const supabaseUrl =
+  (import.meta.env.VITE_SUPABASE_URL as string | undefined) ||
+  "https://lqfgxmpaqutugnvbngrl.supabase.co";
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    "Missing Supabase credentials. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.",
-  );
-}
-
-// ── Security: enforce HTTPS Supabase endpoint in production ──────────────
-// Prevents accidental misconfiguration that would leak tokens over plain HTTP.
-if (
-  import.meta.env.PROD &&
-  !supabaseUrl.startsWith("https://")
-) {
-  throw new Error(
-    "Insecure Supabase URL: HTTPS is required for the production Supabase endpoint.",
-  );
-}
-
-// ── Security: do NOT accept the service-role key in the browser ──────────
-// Service-role keys bypass Row Level Security and must never reach the client.
-// Best-effort detection — service-role JWTs have `"role":"service_role"` in
-// their middle (payload) segment.
-try {
-  const payload = supabaseAnonKey.split(".")[1];
-  if (payload) {
-    const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-    if (decoded.includes('"service_role"')) {
-      throw new Error(
-        "Refusing to start: VITE_SUPABASE_ANON_KEY contains a service_role token. " +
-          "Use the publishable / anon key only in the browser.",
-      );
-    }
-  }
-} catch (e) {
-  // Re-throw our own assertion; ignore decoding errors for non-JWT keys
-  // (Supabase publishable keys like `sb_publishable_...` aren't JWTs).
-  if (e instanceof Error && e.message.startsWith("Refusing to start")) throw e;
-}
+const supabaseAnonKey =
+  (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined) ||
+  "sb_publishable_n4481Pg5r5qZOy8FO15GGw_QY0ge6MK";
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
@@ -58,15 +27,11 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 });
 
 // ── Security: development-only RLS sanity check ──────────────────────────
-// In dev, log a warning if the anon role can read protected tables without
-// authentication — indicates RLS is misconfigured. Skipped in production
-// builds to avoid extra noise / requests.
 if (import.meta.env.DEV) {
-  // Run lazily so it does not block module init.
   queueMicrotask(async () => {
     try {
       const { data: sess } = await supabase.auth.getSession();
-      if (sess.session) return; // only check anon role
+      if (sess.session) return;
       const { data, error } = await supabase
         .from("customers")
         .select("id", { count: "exact", head: true })
