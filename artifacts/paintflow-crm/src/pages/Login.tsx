@@ -24,9 +24,9 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
+    <div className="min-h-screen grid md:grid-cols-2">
       {/* Left panel — branding */}
-      <div className="hidden lg:flex flex-col justify-between bg-sidebar p-12 text-sidebar-foreground">
+      <div className="hidden md:flex flex-col justify-between bg-sidebar p-10 text-sidebar-foreground">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-sm overflow-hidden">
             <img
@@ -74,7 +74,7 @@ export default function Login() {
       <div className="flex items-center justify-center p-8 bg-background">
         <div className="w-full max-w-sm space-y-8">
           {/* Mobile logo */}
-          <div className="flex items-center gap-3 lg:hidden">
+          <div className="flex items-center gap-3 md:hidden">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white border border-border overflow-hidden">
               <img
                 src={profile.logo_url}
