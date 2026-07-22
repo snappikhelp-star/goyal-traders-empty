@@ -3,13 +3,17 @@ import type { Database } from "./database.types";
 
 // Vite bakes VITE_* vars into the bundle at build time.
 // The publishable/anon key is designed to be safe in client-side code.
-const supabaseUrl =
-  (import.meta.env.VITE_SUPABASE_URL as string | undefined) ||
-  "https://lqfgxmpaqutugnvbngrl.supabase.co";
+// These MUST be set as environment variables — no fallback values so that
+// a missing config fails loudly instead of silently using a wrong project.
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-const supabaseAnonKey =
-  (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined) ||
-  "sb_publishable_n4481Pg5r5qZOy8FO15GGw_QY0ge6MK";
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    "[supabase] VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be set. " +
+      "Add them as environment variables before building.",
+  );
+}
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {

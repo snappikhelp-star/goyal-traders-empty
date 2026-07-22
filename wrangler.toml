@@ -12,8 +12,8 @@
 #      variables). Variables set only in wrangler.toml's [vars] are NOT
 #      injected into the build step for Pages — they must be set in the
 #      dashboard, which is why VITE_* vars were previously undefined:
-#        VITE_SUPABASE_URL      = https://lqfgxmpaqutugnvbngrl.supabase.co
-#        VITE_SUPABASE_ANON_KEY = <your anon key>
+#        VITE_SUPABASE_URL      = https://idsofgobnyusnwaojlam.supabase.co
+#        VITE_SUPABASE_ANON_KEY = sb_publishable_lCW8q_Dbp4oEHv2_NvvCTQ_0SC8W-Ez
 #        PORT                   = 5000
 #        BASE_PATH              = /
 #   5. Node version is pinned via the root .node-version file (20). No

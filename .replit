@@ -10,8 +10,8 @@ integrations = ["javascript_database:1.0.0"]
 [userenv]
 
 [userenv.shared]
-VITE_SUPABASE_ANON_KEY = "sb_publishable_n4481Pg5r5qZOy8FO15GGw_QY0ge6MK"
-VITE_SUPABASE_URL = "https://lqfgxmpaqutugnvbngrl.supabase.co"
+VITE_SUPABASE_ANON_KEY = "sb_publishable_lCW8q_Dbp4oEHv2_NvvCTQ_0SC8W-Ez"
+VITE_SUPABASE_URL = "https://idsofgobnyusnwaojlam.supabase.co"
 PORT = "5000"
 BASE_PATH = "/"
 
