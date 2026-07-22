@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
@@ -18,7 +18,33 @@ if (!basePath) {
 // Ensure the path always ends with "/" for PWA manifest correctness
 const manifestBase = basePath.endsWith("/") ? basePath : `${basePath}/`;
 
-export default defineConfig({
+export default defineConfig(async ({ mode }) => {
+  // Cloudflare Pages exposes dashboard variables to the build process via
+  // process.env. Explicitly load the app's Vite env directory as well so the
+  // behavior is the same whether the build runs from the workspace root or
+  // from artifacts/paintflow-crm.
+  const env = loadEnv(mode, path.resolve(import.meta.dirname), "VITE_");
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || env.VITE_SUPABASE_URL;
+  const supabaseAnonKey =
+    process.env.VITE_SUPABASE_ANON_KEY || env.VITE_SUPABASE_ANON_KEY;
+
+  if (mode === "production") {
+    console.info(
+      `[vite] VITE_SUPABASE_URL=${supabaseUrl || "<missing>"}`,
+    );
+    console.info(
+      `[vite] VITE_SUPABASE_ANON_KEY=${supabaseAnonKey ? `<set:${supabaseAnonKey.length} chars>` : "<missing>"}`,
+    );
+  }
+
+  return {
+  define: {
+    // Cloudflare Pages supplies these as process.env during the build. Vite
+    // only exposes values from env files automatically, so explicitly bridge
+    // dashboard variables into the client bundle.
+    "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
+    "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(supabaseAnonKey),
+  },
   base: basePath,
   plugins: [
     react(),
@@ -169,4 +195,5 @@ export default defineConfig({
     host: "0.0.0.0",
     allowedHosts: true,
   },
+  };
 });
