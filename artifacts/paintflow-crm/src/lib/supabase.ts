@@ -19,8 +19,8 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
-    flowType: "pkce",
+    detectSessionInUrl: false, // password-based auth doesn't use URL callbacks
+    flowType: "implicit",     // no PKCE redirect needed for signInWithPassword
     storageKey: "goyal-traders-auth",
   },
   global: {

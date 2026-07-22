@@ -58,8 +58,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return { error: error.message };
+    console.log("[auth] signInWithPassword →", {
+      url: import.meta.env.VITE_SUPABASE_URL,
+      email,
+    });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      console.error("[auth] signInWithPassword error →", {
+        message: error.message,
+        status: error.status,
+        code: (error as { code?: string }).code,
+      });
+      return { error: error.message };
+    }
+    console.log("[auth] signInWithPassword success → user:", data.user?.id);
     return { error: null };
   }, []);
 
