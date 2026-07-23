@@ -68,9 +68,15 @@ export function useShopProfile() {
     retry: 0,
   });
 
+  // Strip undefined values so a null DB column never overwrites a valid default
+  // (e.g. logo_url: null in the DB must not erase the fallback logo path).
+  const overrides = Object.fromEntries(
+    Object.entries(query.data ?? {}).filter(([, v]) => v !== undefined && v !== null),
+  );
+
   const profile: ShopProfile = {
     ...DEFAULT_SHOP_PROFILE,
-    ...(query.data ?? {}),
+    ...overrides,
   };
 
   return { profile, isLoading: query.isLoading };
